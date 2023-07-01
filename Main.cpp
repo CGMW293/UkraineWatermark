@@ -1,12 +1,10 @@
 #include <Windows.h> 
 #include <gdiplus.h>
-#pragma comment(lib,"gdiplus.lib")
+#pragma comment(lib,"gdiplus.lib") //idk why i need this
 #include <iostream>
 void drawText(HDC hdc, int x, int y, const char* text) //HDC is a handle
 {
-	// Create a device context.
-
-	// Create a font object.
+	// Create a font 
 	LPCSTR god = "help";
 	LPCWSTR dammit = L"MADE IN UKRAINE";
 	HFONT font = CreateFontA(100, 0, 0, 0, 0, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH, god);
@@ -14,9 +12,9 @@ void drawText(HDC hdc, int x, int y, const char* text) //HDC is a handle
 	// Select the font into the device context.
 	SelectObject(hdc, font);
 
-	SetTextColor(hdc, RGB(200, 200, 200));	// Set the text color.
+	SetTextColor(hdc, RGB(200, 200, 200));	// Set the text colour. (Grey)
 
-	SetBkMode(hdc, TRANSPARENT); //Make the text transparent
+	SetBkMode(hdc, TRANSPARENT); //Make the bcakground transparent
 	TextOut(hdc, 0, 0, dammit, strlen("MADE IN UKRAINE")); 	// Draw the text.
 
 	// Delete the font object.
@@ -64,26 +62,21 @@ LRESULT CALLBACK Wndproc(HWND Handle, UINT msg, WPARAM wParam, LPARAM lParam)
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	TCHAR szPath[MAX_PATH];
-	GetModuleFileName(NULL, szPath, MAX_PATH);
+	GetModuleFileName(NULL, szPath, MAX_PATH); // Finds executable file path
 
 	HKEY hKey;
-	if (RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_SET_VALUE, &hKey) == ERROR_SUCCESS)
-	{
-		RegSetValueEx(hKey, TEXT("MyProgram"), 0, REG_SZ, (LPBYTE)szPath, sizeof(TCHAR) * (lstrlen(szPath) + 1));
+	//Idk how tf any of this works
+	RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_SET_VALUE, &hKey);
+	RegSetValueEx(hKey, TEXT("MyProgram"), 0, REG_SZ, (LPBYTE)szPath, sizeof(TCHAR) * (lstrlen(szPath) + 1));
+	RegCloseKey(hKey);
 
-		RegCloseKey(hKey);
-	}
-	else
-	{
-		std::cout << "Failed to open registry key!" << std::endl;
-	}
-	//add gdiplus
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
 
 	const LPCWSTR ClassName = L"Haii!!!!";
 	WNDCLASSEX hai = { 0 }; //Zeros out the hai structure, contains information for a window class
+	
 	//Defines all hai parameters for the window structure https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-wndclassexa
 	hai.cbSize = sizeof(hai);
 	hai.style = CS_HREDRAW | CS_VREDRAW;
@@ -102,7 +95,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	HWND Handle = CreateWindowEx(WS_EX_TOOLWINDOW, ClassName, L"made in ukraine", WS_POPUP, screenWidth-785, screenHeight-125, 800, 80, nullptr, nullptr, hInstance, nullptr);
 	SetWindowLong(Handle, GWL_EXSTYLE, GetWindowLong(Handle, GWL_EXSTYLE) | WS_EX_LAYERED);
 	SetLayeredWindowAttributes(Handle, RGB(0, 0, 0), 0, LWA_COLORKEY); //Makes the window transparent
-	BOOL did_it_run = ShowWindow(Handle, LWA_COLORKEY);//shows the window
+	BOOL did_it_run = ShowWindow(Handle, LWA_COLORKEY); //shows the window
 	SetWindowPos(Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);//Makes sure the window is always the topmost
 	MSG msg;
 	while (GetMessage(&msg, nullptr, 0, 0) > 0) {
